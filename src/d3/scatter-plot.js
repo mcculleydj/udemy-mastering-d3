@@ -53,8 +53,8 @@ export function drawCanvas() {
   const legend = plot.append('g').attr(
     'transform',
     `translate(
-        ${width - margin.right - 15},
-        ${height - margin.bottom - 50}
+        ${width - margin.right - 40},
+        ${height - margin.bottom - 10}
       )`,
   )
 
@@ -62,18 +62,17 @@ export function drawCanvas() {
     const legendRow = legend.append('g')
 
     legendRow
-      .append('rect')
-      .attr('width', 10)
-      .attr('height', 10)
-      .attr('x', 0)
-      .attr('y', 20 * i)
+      .append('circle')
+      .attr('cx', 0)
+      .attr('cy', 20 * i)
+      .attr('r', 5)
       .attr('fill', color(c))
 
     legendRow
       .append('text')
-      .attr('font-size', '14px')
+      .attr('font-size', '15px')
       .attr('x', 15)
-      .attr('y', 20 * i + 10)
+      .attr('y', 20 * i + 5)
       .style('text-transform', 'capitalize')
       .text(c)
   })
@@ -137,7 +136,7 @@ export function updatePlot(
 
   // join
   const points = plot
-    .selectAll('circle')
+    .selectAll('circle.point')
     .data(filteredCountries, d => d.country)
 
   // remove
@@ -157,7 +156,6 @@ export function updatePlot(
         .append('text')
         .attr('text-anchor', 'middle')
         .text(d.country)
-        .attr('font-weight', 'bold')
         .attr('font-size', '36px')
         .attr('fill', 'gray')
     })
@@ -175,6 +173,7 @@ export function updatePlot(
     .attr('fill', d =>
       d.country === selectedCountry ? 'gold' : color(d.continent),
     )
+    .attr('class', 'point')
     .style('cursor', 'pointer')
 
   // year
@@ -191,12 +190,10 @@ export function updatePlot(
   yearEl
     .enter()
     .append('text')
-    .attr('font-size', '24px')
+    .attr('font-size', '36px')
     .attr('fill', 'gray')
-    .attr(
-      'transform',
-      `translate(${width - margin.right - 15}, ${height - margin.bottom + 60})`,
-    )
+    .attr('text-anchor', 'middle')
+    .attr('transform', `translate(${width / 2}, 30)`)
     .attr('class', 'year-svg-group')
     .text(d => d)
 }
@@ -217,7 +214,7 @@ export function updateInfo(plot, countries, selectedCountry) {
   // render and update
   const infoGroup = plot
     .append('g')
-    .attr('transform', `translate(20, 20)`)
+    .attr('transform', `translate(20, 18)`)
     .attr('class', 'info-svg-group')
 
   infoGroup
