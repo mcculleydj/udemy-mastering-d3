@@ -76,13 +76,6 @@ export default {
   async mounted() {
     this.plotData = await readData()
     this.plot = drawCanvas()
-    // updatePlot(
-    //   this.plot,
-    //   this.plotData[this.index++],
-    //   this.selectedCountry,
-    //   this.selectedContinent,
-    //   { selectCountry: this.selectCountry },
-    // )
     this.playFn()
   },
 
@@ -202,17 +195,6 @@ export default {
       )
     },
   },
-
-  //   handleSlide(evt) {
-  //     this.index = evt - 1800
-  //     this.allCountries = this.data[this.index].countries
-  //       .filter(
-  //         c => c.population && c.life_exp && c.income && c.population >= 2000,
-  //       )
-  //       .sort((c1, c2) => c2.population - c1.population)
-  //     this.updateFn(this.allCountries, String(evt))
-  //   },
-  // },
 }
 </script>
 
