@@ -40,7 +40,7 @@
       </v-col>
     </v-row>
     <v-row justify="center">
-      <svg width="400" height="600" />
+      <div id="gap-minder-svg-container" />
     </v-row>
   </v-container>
 </template>

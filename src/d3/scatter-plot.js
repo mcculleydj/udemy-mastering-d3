@@ -34,12 +34,13 @@ const area = d3
   .range([25 * Math.PI, 1500 * Math.PI])
 
 export async function readData() {
-  return await d3.json('data.json')
+  return await d3.json('gapMinderData.json')
 }
 
 export function drawCanvas() {
   const svg = d3
-    .select('svg')
+    .select('#gap-minder-svg-container')
+    .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
 
