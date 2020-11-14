@@ -13,6 +13,15 @@ const races = [
   { label: 'Other', color: 'rgb(167,153,183)' },
 ]
 
+const raceToColor = {
+  black1nh: 'rgb(56,153,201)',
+  white1nh: 'rgb(251,54,64)',
+  asianpi1nh: 'rgb(137,255,167)',
+  other1nh: 'rgb(167,153,183)',
+  hisp: 'rgb(255,240,124)',
+  native1nh: 'rgb(232,128,12)',
+}
+
 let svg
 let projection
 
@@ -63,8 +72,15 @@ export async function drawCanvas() {
   })
 }
 
-export async function updateMap(year) {
-  const censusData = await d3.json(`dc-points-${year}.json`)
+export async function updateMap(year, race) {
+  let censusData = await d3.json(`dc-points-${year}.json`)
+
+  if (race !== 'all') {
+    censusData = censusData.filter(
+      d => d.properties.color === raceToColor[race],
+    )
+  }
+
   const projectedData = censusData.map(d =>
     d3GeoProjection.geoProject(d, projection),
   )

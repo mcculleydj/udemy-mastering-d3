@@ -12,6 +12,17 @@
           style="width: 250px"
         />
       </v-col>
+      <v-col cols="auto">
+        <v-select
+          v-model="race"
+          :items="raceItems"
+          @change="update()"
+          outlined
+          :hint="loading ? 'Loading...' : ''"
+          persistent-hint
+          style="width: 250px"
+        />
+      </v-col>
     </v-row>
     <v-row>
       <v-col>
@@ -34,19 +45,29 @@ export default {
       { text: '2010 Census', value: '10' },
       { text: '2012-2016 ACS Census', value: 'ACS' },
     ],
+    race: 'all',
+    raceItems: [
+      { text: 'All Races', value: 'all' },
+      { text: 'Black', value: 'black1nh' },
+      { text: 'Hispanic', value: 'hisp' },
+      { text: 'White', value: 'white1nh' },
+      { text: 'Asian / Pacific Islander', value: 'asianpi1nh' },
+      { text: 'Native', value: 'native1nh' },
+      { text: 'Other', value: 'other1nh' },
+    ],
   }),
 
   async mounted() {
     this.loading = true
     await drawCanvas()
-    await updateMap(this.year)
+    await updateMap(this.year, this.race)
     this.loading = false
   },
 
   methods: {
     async update() {
       this.loading = true
-      await updateMap(this.year)
+      await updateMap(this.year, this.race)
       this.loading = false
     },
   },
