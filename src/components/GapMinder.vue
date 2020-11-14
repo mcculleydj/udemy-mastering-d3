@@ -33,7 +33,7 @@
           v-model="year"
           thumb-label="always"
           min="1800"
-          max="2015"
+          max="2014"
           @mousedown="pauseFn()"
           @end="setYear($event)"
         />
