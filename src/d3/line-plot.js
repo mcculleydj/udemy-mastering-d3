@@ -43,7 +43,7 @@ const yAxisCall = d3
   .tickFormat(formatAbbreviation)
 
 export async function readData() {
-  return await d3.json('cryptoData.json')
+  return await d3.json('crypto.json')
 }
 
 export function drawCanvas() {

@@ -34,7 +34,7 @@ const area = d3
   .range([25 * Math.PI, 1500 * Math.PI])
 
 export async function readData() {
-  return await d3.json('gapMinderData.json')
+  return await d3.json('gap-minder.json')
 }
 
 export function drawCanvas() {

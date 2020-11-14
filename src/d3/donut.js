@@ -4,8 +4,8 @@ import * as d3 from 'd3'
 const regions = ['North', 'South', 'East', 'West', 'Central']
 
 // size
-const width = 540
-const height = 540
+const width = 400
+const height = 400
 const radius = Math.min(width, height) / 2
 
 // color scale

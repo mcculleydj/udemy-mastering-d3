@@ -10,8 +10,12 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+      <v-col cols="auto mr-10">
         <div id="donut-svg-container"></div>
+      </v-col>
+      <v-col style="border-left: 1px solid lightgray" class="pl-10">
+        <h4 class="mb-3">SOURCE DATA</h4>
+        <pre>{{ chartData[fruit] }}</pre>
       </v-col>
     </v-row>
   </v-container>
