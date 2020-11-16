@@ -24,6 +24,9 @@
         />
       </v-col>
     </v-row>
+    <v-row justify="center" class="mr-10">
+      <div id="crpyto-svg-container"></div>
+    </v-row>
     <v-row
       justify="center"
       align="center"
@@ -33,7 +36,7 @@
       <span style="width: 100px" class="text-center">
         {{ dateTicks[dateRange[0]].display }}
       </span>
-      <v-col>
+      <v-col class="px-0">
         <v-range-slider
           v-model="dateRange"
           min="0"
@@ -45,9 +48,6 @@
       <span style="width: 100px" class="text-center">
         {{ dateTicks[dateRange[1]].display }}
       </span>
-    </v-row>
-    <v-row justify="center" class="mr-10">
-      <div id="crpyto-svg-container"></div>
     </v-row>
   </v-container>
 </template>

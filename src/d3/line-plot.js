@@ -1,5 +1,7 @@
 import * as d3 from 'd3'
 
+// original code
+
 const margin = { left: 100, right: 30, top: 30, bottom: 30 }
 const width = 800 - margin.left - margin.right
 const height = 500 - margin.top - margin.bottom

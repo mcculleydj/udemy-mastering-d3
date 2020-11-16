@@ -1,25 +1,15 @@
 import * as d3 from 'd3'
 import * as d3GeoProjection from 'd3-geo-projection'
 
-const width = 700
-const height = 700
+const width = 800
+const height = 800
 
-const races = [
-  { label: 'Black', color: 'rgb(56,153,201)' },
-  { label: 'Hispanic', color: 'rgb(255,240,124)' },
-  { label: 'White', color: 'rgb(251,54,64)' },
-  { label: 'Asian / Pacific Islander', color: 'rgb(137,255,167)' },
-  { label: 'Native', color: 'rgb(232,128,12)' },
-  { label: 'Other', color: 'rgb(167,153,183)' },
-]
-
-const raceToColor = {
-  black1nh: 'rgb(56,153,201)',
-  white1nh: 'rgb(251,54,64)',
-  asianpi1nh: 'rgb(137,255,167)',
-  other1nh: 'rgb(167,153,183)',
-  hisp: 'rgb(255,240,124)',
-  native1nh: 'rgb(232,128,12)',
+const colors = {
+  Black: 'purple',
+  White: 'green',
+  'Asian / Pacific Islander': 'red',
+  Other: 'pink',
+  Hispanic: 'orange',
 }
 
 let svg
@@ -52,7 +42,7 @@ export async function drawCanvas() {
     .append('g')
     .attr('transform', `translate(${width - 200}, 10)`)
 
-  races.forEach((r, i) => {
+  Object.keys(colors).forEach((r, i) => {
     const legendRow = legend.append('g')
 
     legendRow
@@ -61,24 +51,22 @@ export async function drawCanvas() {
       .attr('y', 20 * i)
       .attr('width', 10)
       .attr('height', 10)
-      .attr('fill', r.color)
+      .attr('fill', colors[r])
 
     legendRow
       .append('text')
       .attr('font-size', '15px')
       .attr('x', 20)
       .attr('y', 20 * i + 10)
-      .text(r.label)
+      .text(r)
   })
 }
 
 export async function updateMap(year, race) {
   let censusData = await d3.json(`dc-points-${year}.json`)
 
-  if (race !== 'all') {
-    censusData = censusData.filter(
-      d => d.properties.color === raceToColor[race],
-    )
+  if (race !== 'All Races') {
+    censusData = censusData.filter(d => d.properties.race === race)
   }
 
   const projectedData = censusData.map(d =>
@@ -99,5 +87,6 @@ export async function updateMap(year, race) {
     .merge(points)
     .attr('cx', d => d.geometry.coordinates[0])
     .attr('cy', d => d.geometry.coordinates[1])
-    .attr('fill', d => d.properties.color)
+    .attr('fill', d => colors[d.properties.race])
+    .attr('fill-opacity', 0.8)
 }

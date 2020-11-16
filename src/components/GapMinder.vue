@@ -2,13 +2,13 @@
   <v-container style="max-width: 800px" class="mt-5">
     <v-row justify="center" align="center" class="mb-8 mx-12">
       <v-col cols="auto">
-        <v-btn @click="play ? pauseFn() : playFn()" color="primary">
+        <v-btn @click="play ? pauseFn() : playFn()" color="primary" outlined>
           <v-icon>{{ play ? 'mdi-pause' : 'mdi-play' }}</v-icon>
           {{ play ? 'Pause' : 'Play' }}
         </v-btn>
       </v-col>
       <v-col cols="auto">
-        <v-btn @click="reset()" color="primary">
+        <v-btn @click="reset()" color="primary" outlined>
           <v-icon>mdi-refresh</v-icon>
           Reset
         </v-btn>
