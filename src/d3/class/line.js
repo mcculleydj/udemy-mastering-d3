@@ -1,8 +1,5 @@
 import * as d3 from 'd3'
 
-// time parser for x-scale
-const parseTime = d3.timeParse('%d/%m/%Y')
-
 // for tooltip
 const bisectDate = d3.bisector(d => d.date).left
 
@@ -36,6 +33,10 @@ const yAxisFn = d3
 export default class LinePlot {
   static async readData(uri) {
     return await d3.json(uri)
+  }
+
+  static parseDate(format, date) {
+    return d3.timeParse(format)(date)
   }
 
   constructor(selector, { width, height, margins }) {
@@ -87,18 +88,10 @@ export default class LinePlot {
   }
 
   update(data, metric, dateRange) {
-    // clean data
-    const cleanData = data
-      .filter(d => d.date && d[metric])
-      .map(d => ({
-        date: parseTime(d.date),
-        value: Number(d[metric]),
-      }))
-
     // apply date range
-    this.rangedData = cleanData
+    this.rangedData = data
     if (dateRange) {
-      this.rangedData = cleanData.filter(
+      this.rangedData = data.filter(
         d => d.date >= dateRange[0] && d.date <= dateRange[1],
       )
     }
@@ -109,7 +102,7 @@ export default class LinePlot {
 
     // set scale domains
     this.x.domain(d3.extent(this.rangedData, d => d.date))
-    this.y.domain([0, d3.max(this.rangedData, d => d.value) * 1.005])
+    this.y.domain([0, d3.max(this.rangedData, d => d.value) * 1.1])
 
     // generate axes once scales have been set
     this.xAxis
@@ -141,14 +134,25 @@ export default class LinePlot {
       .attr('class', 'x-hover-line hover-line')
       .attr('y1', 0)
       .attr('y2', this.height)
+      .attr('stroke', '#777')
+      .attr('stroke-width', '2px')
+      .attr('stroke-dasharray', '3, 3')
 
     this.focus
       .append('line')
       .attr('class', 'y-hover-line hover-line')
       .attr('x1', 0)
       .attr('x2', this.width)
+      .attr('stroke', '#777')
+      .attr('stroke-width', '2px')
+      .attr('stroke-dasharray', '3, 3')
 
-    this.focus.append('circle').attr('r', 7.5)
+    this.focus
+      .append('circle')
+      .attr('r', 7.5)
+      .attr('fill', '#f1f3f3')
+      .attr('stroke', '#777')
+      .attr('stroke-width', '3px')
 
     this.plot
       .append('text')
@@ -163,6 +167,8 @@ export default class LinePlot {
       .attr('class', 'overlay')
       .attr('width', this.width)
       .attr('height', this.height)
+      .attr('fill', 'none')
+      .style('pointer-events', 'all')
       .on('mouseover', () => {
         this.focus.style('display', null)
         this.plot.select('text.tip-value').style('display', null)

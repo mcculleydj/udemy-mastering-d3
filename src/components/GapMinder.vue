@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { readData, drawCanvas, updatePlot, updateInfo } from '@/d3/scatter-plot'
+import { readData, drawCanvas, updatePlot, updateInfo } from '@/d3/scatter'
 
 export default {
   data: () => ({

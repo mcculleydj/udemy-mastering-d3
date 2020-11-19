@@ -1,7 +1,7 @@
 <template>
-  <v-container style="max-width: 800px" class="mt-5">
-    <v-row justify="center" class="mx-12">
-      <v-col>
+  <v-container>
+    <v-row align="center">
+      <v-col cols="auto">
         <v-select
           label="Currency"
           v-model="coin"
@@ -9,10 +9,11 @@
           outlined
           hide-details
           dense
-          @change="update()"
+          style="max-width: 200px"
+          @change="updateCoinOrMetric()"
         />
       </v-col>
-      <v-col>
+      <v-col cols="auto">
         <v-select
           label="Metric"
           v-model="metric"
@@ -20,86 +21,63 @@
           outlined
           hide-details
           dense
-          @change="update()"
+          style="max-width: 200px"
+          @change="updateCoinOrMetric()"
         />
       </v-col>
     </v-row>
-    <v-row justify="center" class="mr-10">
-      <div id="crpyto-svg-container"></div>
-    </v-row>
-    <v-row
-      justify="center"
-      align="center"
-      class="mx-12 mt-5"
-      v-if="dateTicks.length > 1"
-    >
-      <span style="width: 100px" class="text-center">
-        {{ dateTicks[dateRange[0]].display }}
-      </span>
-      <v-col class="px-0">
-        <v-range-slider
-          v-model="dateRange"
-          min="0"
-          :max="dateTicks.length > 0 ? dateTicks.length - 1 : 1"
-          hide-details
-          @end="handleRange()"
-        />
+    <v-row>
+      <v-col class="pb-0">
+        <div id="crypto-svg-container"></div>
       </v-col>
-      <span style="width: 100px" class="text-center">
-        {{ dateTicks[dateRange[1]].display }}
-      </span>
+    </v-row>
+    <v-row>
+      <v-col class="py-0">
+        <div id="timeline-svg-container"></div>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import { readData, drawCanvas, updatePlot } from '@/d3/line-plot'
+import LinePlot from '@/d3/class/line'
+import Timeline from '@/d3/class/timeline'
 
-const monthMap = {
-  '1': 'Jan',
-  '2': 'Feb',
-  '3': 'Mar',
-  '4': 'Apr',
-  '5': 'May',
-  '6': 'Jun',
-  '7': 'Jul',
-  '8': 'Aug',
-  '9': 'Sep',
-  '10': 'Oct',
-  '11': 'Nov',
-  '12': 'Dec',
+const linePlotSize = {
+  width: 800,
+  height: 400,
+  margins: {
+    left: 70,
+    right: 30,
+    top: 10,
+    bottom: 30,
+  },
+}
+
+const timelineSize = {
+  width: 800,
+  height: 150,
+  margins: {
+    left: 70,
+    right: 30,
+    top: 10,
+    bottom: 30,
+  },
+}
+
+function cleanData(data, property) {
+  return data
+    .filter(d => d.date && d[property])
+    .map(d => ({
+      date: Timeline.parseDate('%d/%m/%Y', d.date),
+      value: Number(d[property]),
+    }))
 }
 
 export default {
-  computed: {
-    dateTicks() {
-      if (this.extent.length < 2) return []
-      let month = this.extent[0].getMonth() + 1
-      let year = this.extent[0].getFullYear()
-      const endMonth = this.extent[1].getMonth() + 1
-      const endYear = this.extent[1].getFullYear()
-      const labels = []
-      while (month !== endMonth || year !== endYear) {
-        labels.push({
-          date: new Date(Date.parse(`${month} 01 ${year}`)),
-          display: `${monthMap[month++]} ${year}`,
-        })
-        if (month === 13) {
-          month = 1
-          year++
-        }
-      }
-      labels.push({
-        date: new Date(Date.parse(`${endMonth} 01 ${endYear}`)),
-        display: `${monthMap[endMonth]} ${endYear}`,
-      })
-      return labels
-    },
-  },
-
   data: () => ({
-    plotData: [],
-    svgGroups: null,
+    rawData: null,
+    linePlot: null,
     coin: 'bitcoin',
     coinItems: [
       { text: 'Bitcoin', value: 'bitcoin' },
@@ -114,109 +92,41 @@ export default {
       { text: 'Market Cap', value: 'market_cap' },
       { text: 'Daily Volume', value: '24h_vol' },
     ],
-    dateRange: [0, 1],
-    extent: [],
+    timeline: null,
+    hasRange: false,
   }),
 
   async mounted() {
-    this.plotData = await readData()
-    this.svgGroups = drawCanvas()
-    this.extent = updatePlot(
-      this.svgGroups,
-      this.plotData[this.coin],
-      this.metric,
+    this.rawData = await LinePlot.readData('crypto.json')
+
+    this.linePlot = new LinePlot('#crypto-svg-container', linePlotSize)
+    const data = cleanData(this.rawData[this.coin], this.metric)
+    this.linePlot.update(data, this.metric)
+
+    const callbacks = {
+      onBrush: this.onBrush,
+    }
+    this.timeline = new Timeline(
+      '#timeline-svg-container',
+      timelineSize,
+      callbacks,
     )
+    this.timeline.update(data, this.metric)
   },
 
   methods: {
-    update() {
-      this.extent = updatePlot(
-        this.svgGroups,
-        this.plotData[this.coin],
-        this.metric,
-      )
+    updateCoinOrMetric() {
+      const data = cleanData(this.rawData[this.coin], this.metric)
+      this.linePlot.update(data, this.metric)
+      this.timeline.update(data, this.metric)
+      this.timeline.resetBrush()
     },
 
-    handleRange() {
-      const dateRange = [
-        this.dateTicks[this.dateRange[0]].date,
-        this.dateTicks[this.dateRange[1]].date,
-      ]
-      updatePlot(
-        this.svgGroups,
-        this.plotData[this.coin],
-        this.metric,
-        dateRange,
-      )
-    },
-  },
-
-  watch: {
-    dateTicks() {
-      this.dateRange = [0, this.dateTicks.length - 1]
+    onBrush(dateRange) {
+      const data = cleanData(this.rawData[this.coin], this.metric)
+      this.linePlot.update(data, this.metric, dateRange)
+      this.hasRange = !!dateRange
     },
   },
 }
 </script>
-
-<style>
-#chart-area svg {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-}
-
-#logo {
-  height: 50px;
-}
-
-.navbar-brand {
-  height: 60px;
-  padding: 5px 0px;
-}
-
-.axis {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #d4d8da;
-  stroke-width: 2px;
-  shape-rendering: crispEdges;
-}
-
-.line {
-  fill: none;
-  stroke-width: 2px;
-}
-
-.overlay {
-  fill: none;
-  pointer-events: all;
-}
-
-.focus circle {
-  fill: #f1f3f3;
-  stroke: #777;
-  stroke-width: 3px;
-}
-
-.hover-line {
-  stroke: #777;
-  stroke-width: 2px;
-  stroke-dasharray: 3, 3;
-}
-
-#selections .col-md-4 {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.line {
-  fill: none;
-  stroke-width: 3px;
-  stroke: grey;
-}
-</style>
